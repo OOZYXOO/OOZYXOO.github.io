@@ -30,10 +30,9 @@ const getLimitsByCreditScore = (creditScore) => {
 };
 
 app.use(cors({
-  origin: (origin, callback) => {
-    callback(null, true);
-  },
-  credentials: true
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'ngrok-skip-browser-warning']
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
