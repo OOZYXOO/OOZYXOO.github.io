@@ -1,5 +1,28 @@
 const API_BASE_URL = 'https://speculate-swifter-suspend.ngrok-free.dev/api';
 
+// 统一的 API 请求函数 - 自动添加 ngrok 跳过警告头
+async function apiRequest(url, options = {}) {
+  const defaultOptions = {
+    headers: {
+      'ngrok-skip-browser-warning': '69420',
+      'Content-Type': 'application/json'
+    }
+  };
+  
+  // 合并自定义选项
+  const finalOptions = {
+    ...defaultOptions,
+    ...options,
+    headers: {
+      ...defaultOptions.headers,
+      ...options.headers
+    }
+  };
+  
+  const response = await fetch(url, finalOptions);
+  return response;
+}
+
 const Auth = {
   getUser() {
     const user = localStorage.getItem('campus_user');
@@ -107,9 +130,8 @@ const LoginPage = {
       }
       loading.value = true;
       try {
-        const res = await fetch(`${API_BASE_URL}/auth/login`, {
+        const res = await apiRequest(`${API_BASE_URL}/auth/login`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(form.value)
         });
         const data = await res.json();
@@ -173,9 +195,8 @@ const RegisterPage = {
       }
       loading.value = true;
       try {
-        const res = await fetch(`${API_BASE_URL}/auth/register`, {
+        const res = await apiRequest(`${API_BASE_URL}/auth/register`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(form.value)
         });
         const data = await res.json();
@@ -308,7 +329,7 @@ const TasksPage = {
     const loadTasks = async () => {
       loading.value = true;
       try {
-        const res = await fetch(`${API_BASE_URL}/tasks`);
+        const res = await apiRequest(`${API_BASE_URL}/tasks`);
         const data = await res.json();
         if (data.success) {
           tasks.value = data.data;
@@ -324,9 +345,9 @@ const TasksPage = {
       const result = await Modal.confirm('确定要接单吗？');
       if (!result) return;
       try {
-        const res = await fetch(`${API_BASE_URL}/tasks/${taskId}/accept`, {
+        const res = await apiRequest(`${API_BASE_URL}/tasks/${taskId}/accept`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+
           body: JSON.stringify({ acceptorId: user.value.id })
         });
         const data = await res.json();
@@ -343,7 +364,7 @@ const TasksPage = {
 
     const refreshUser = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/users/${user.value.id}`);
+        const res = await apiRequest(`${API_BASE_URL}/users/${user.value.id}`);
         const data = await res.json();
         if (data.success) {
           const updatedUser = { ...Auth.getUser(), ...data.data };
@@ -374,9 +395,9 @@ const TasksPage = {
       }
       publishing.value = true;
       try {
-        const res = await fetch(`${API_BASE_URL}/tasks`, {
+        const res = await apiRequest(`${API_BASE_URL}/tasks`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+
           body: JSON.stringify({ ...publishForm.value, creatorId: user.value.id })
         });
         const data = await res.json();
@@ -503,7 +524,7 @@ const ServicesPage = {
     const loadServices = async () => {
       loading.value = true;
       try {
-        const res = await fetch(`${API_BASE_URL}/services`);
+        const res = await apiRequest(`${API_BASE_URL}/services`);
         const data = await res.json();
         if (data.success) {
           services.value = data.data;
@@ -519,9 +540,9 @@ const ServicesPage = {
       const result = await Modal.confirm('确定要下单吗？平台将收取 8% 服务费。');
       if (!result) return;
       try {
-        const res = await fetch(`${API_BASE_URL}/services/${serviceId}/order`, {
+        const res = await apiRequest(`${API_BASE_URL}/services/${serviceId}/order`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+
           body: JSON.stringify({ customerId: user.value.id })
         });
         const data = await res.json();
@@ -538,7 +559,7 @@ const ServicesPage = {
 
     const refreshUser = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/users/${user.value.id}`);
+        const res = await apiRequest(`${API_BASE_URL}/users/${user.value.id}`);
         const data = await res.json();
         if (data.success) {
           const updatedUser = { ...Auth.getUser(), ...data.data };
@@ -569,9 +590,9 @@ const ServicesPage = {
       }
       publishing.value = true;
       try {
-        const res = await fetch(`${API_BASE_URL}/services`, {
+        const res = await apiRequest(`${API_BASE_URL}/services`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+
           body: JSON.stringify({ ...publishForm.value, creatorId: user.value.id })
         });
         const data = await res.json();
@@ -662,7 +683,7 @@ const ForumPage = {
     const loadPosts = async () => {
       loading.value = true;
       try {
-        const res = await fetch(`${API_BASE_URL}/forum`);
+        const res = await apiRequest(`${API_BASE_URL}/forum`);
         const data = await res.json();
         if (data.success) {
           posts.value = data.data;
@@ -676,9 +697,9 @@ const ForumPage = {
 
     const likePost = async (postId) => {
       try {
-        const res = await fetch(`${API_BASE_URL}/forum/${postId}/like`, {
+        const res = await apiRequest(`${API_BASE_URL}/forum/${postId}/like`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+
           body: JSON.stringify({ userId: user.value.id })
         });
         const data = await res.json();
@@ -694,7 +715,7 @@ const ForumPage = {
 
     const refreshUser = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/users/${user.value.id}`);
+        const res = await apiRequest(`${API_BASE_URL}/users/${user.value.id}`);
         const data = await res.json();
         if (data.success) {
           const updatedUser = { ...Auth.getUser(), ...data.data };
@@ -721,9 +742,9 @@ const ForumPage = {
       }
       publishing.value = true;
       try {
-        const res = await fetch(`${API_BASE_URL}/forum`, {
+        const res = await apiRequest(`${API_BASE_URL}/forum`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+
           body: JSON.stringify({
             title: publishForm.value.title,
             content: publishForm.value.content,
@@ -952,7 +973,7 @@ const ProfilePage = {
     const loadTasks = async () => {
       tasksLoading.value = true;
       try {
-        const res = await fetch(`${API_BASE_URL}/users/${user.value.id}/tasks`);
+        const res = await apiRequest(`${API_BASE_URL}/users/${user.value.id}/tasks`);
         const data = await res.json();
         if (data.success) {
           tasksData.value = data.data;
@@ -967,7 +988,7 @@ const ProfilePage = {
     const loadOrders = async () => {
       ordersLoading.value = true;
       try {
-        const res = await fetch(`${API_BASE_URL}/users/${user.value.id}/orders`);
+        const res = await apiRequest(`${API_BASE_URL}/users/${user.value.id}/orders`);
         const data = await res.json();
         if (data.success) {
           ordersData.value = data.data;
@@ -981,7 +1002,7 @@ const ProfilePage = {
 
     const refreshUser = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/users/${user.value.id}`);
+        const res = await apiRequest(`${API_BASE_URL}/users/${user.value.id}`);
         const data = await res.json();
         if (data.success) {
           const updatedUser = { ...Auth.getUser(), ...data.data };
@@ -1008,9 +1029,9 @@ const ProfilePage = {
       }
       passwordChanging.value = true;
       try {
-        const res = await fetch(`${API_BASE_URL}/users/${user.value.id}/change-password`, {
+        const res = await apiRequest(`${API_BASE_URL}/users/${user.value.id}/change-password`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+
           body: JSON.stringify({ 
             currentPassword: passwordForm.value.current, 
             newPassword: passwordForm.value.new,
@@ -1041,9 +1062,9 @@ const ProfilePage = {
       const result = await Modal.confirm('确定要取消这个任务吗？');
       if (!result) return;
       try {
-        const res = await fetch(`${API_BASE_URL}/tasks/${taskId}/cancel`, {
+        const res = await apiRequest(`${API_BASE_URL}/tasks/${taskId}/cancel`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+
           body: JSON.stringify({ userId: user.value.id })
         });
         const data = await res.json();
@@ -1063,9 +1084,9 @@ const ProfilePage = {
       const result = await Modal.confirm('确定任务已完成了吗？');
       if (!result) return;
       try {
-        const res = await fetch(`${API_BASE_URL}/tasks/${taskId}/complete`, {
+        const res = await apiRequest(`${API_BASE_URL}/tasks/${taskId}/complete`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+
           body: JSON.stringify({ userId: user.value.id })
         });
         const data = await res.json();
@@ -1083,9 +1104,9 @@ const ProfilePage = {
 
     const acceptOrder = async (orderId) => {
       try {
-        const res = await fetch(`${API_BASE_URL}/orders/${orderId}/accept`, {
+        const res = await apiRequest(`${API_BASE_URL}/orders/${orderId}/accept`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+
           body: JSON.stringify({ userId: user.value.id })
         });
         const data = await res.json();
@@ -1104,9 +1125,9 @@ const ProfilePage = {
       const result = await Modal.confirm('确定要取消这个订单吗？');
       if (!result) return;
       try {
-        const res = await fetch(`${API_BASE_URL}/orders/${orderId}/cancel`, {
+        const res = await apiRequest(`${API_BASE_URL}/orders/${orderId}/cancel`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+
           body: JSON.stringify({ userId: user.value.id })
         });
         const data = await res.json();
@@ -1126,9 +1147,9 @@ const ProfilePage = {
       const result = await Modal.confirm('确定订单已完成了吗？');
       if (!result) return;
       try {
-        const res = await fetch(`${API_BASE_URL}/orders/${orderId}/complete`, {
+        const res = await apiRequest(`${API_BASE_URL}/orders/${orderId}/complete`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+
           body: JSON.stringify({ userId: user.value.id })
         });
         const data = await res.json();
@@ -1525,7 +1546,7 @@ const AdminPage = {
     const loadDashboard = async () => {
       loading.value = true;
       try {
-        const res = await fetch(`${API_BASE_URL}/admin/stats`);
+        const res = await apiRequest(`${API_BASE_URL}/admin/stats`);
         const data = await res.json();
         if (data.success) stats.value = data.data;
       } catch (e) { console.error('加载统计失败', e); }
@@ -1535,7 +1556,7 @@ const AdminPage = {
     const loadUsers = async () => {
       loading.value = true;
       try {
-        const res = await fetch(`${API_BASE_URL}/admin/users`);
+        const res = await apiRequest(`${API_BASE_URL}/admin/users`);
         const data = await res.json();
         if (data.success) users.value = data.data;
       } catch (e) { console.error('加载用户失败', e); }
@@ -1545,7 +1566,7 @@ const AdminPage = {
     const loadTasks = async () => {
       loading.value = true;
       try {
-        const res = await fetch(`${API_BASE_URL}/admin/tasks`);
+        const res = await apiRequest(`${API_BASE_URL}/admin/tasks`);
         const data = await res.json();
         if (data.success) tasks.value = data.data;
       } catch (e) { console.error('加载任务失败', e); }
@@ -1555,7 +1576,7 @@ const AdminPage = {
     const loadServices = async () => {
       loading.value = true;
       try {
-        const res = await fetch(`${API_BASE_URL}/admin/services`);
+        const res = await apiRequest(`${API_BASE_URL}/admin/services`);
         const data = await res.json();
         if (data.success) services.value = data.data;
       } catch (e) { console.error('加载服务失败', e); }
@@ -1565,7 +1586,7 @@ const AdminPage = {
     const loadOrders = async () => {
       loading.value = true;
       try {
-        const res = await fetch(`${API_BASE_URL}/admin/orders`);
+        const res = await apiRequest(`${API_BASE_URL}/admin/orders`);
         const data = await res.json();
         if (data.success) orders.value = data.data;
       } catch (e) { console.error('加载订单失败', e); }
@@ -1575,7 +1596,7 @@ const AdminPage = {
     const loadForum = async () => {
       loading.value = true;
       try {
-        const res = await fetch(`${API_BASE_URL}/admin/forum`);
+        const res = await apiRequest(`${API_BASE_URL}/admin/forum`);
         const data = await res.json();
         if (data.success) posts.value = data.data;
       } catch (e) { console.error('加载论坛失败', e); }
@@ -1584,7 +1605,7 @@ const AdminPage = {
 
     const loadSettings = async () => {
       try {
-        const res = await fetch(`${API_BASE_URL}/config/colors`);
+        const res = await apiRequest(`${API_BASE_URL}/config/colors`);
         const data = await res.json();
         if (data.success) settings.value = data.data;
       } catch (e) { console.error('加载设置失败', e); }
@@ -1593,9 +1614,9 @@ const AdminPage = {
     const saveSettings = async () => {
       saving.value = true;
       try {
-        const res = await fetch(`${API_BASE_URL}/admin/colors`, {
+        const res = await apiRequest(`${API_BASE_URL}/admin/colors`, {
           method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
+
           body: JSON.stringify(settings.value)
         });
         const data = await res.json();
@@ -1643,9 +1664,9 @@ const AdminPage = {
       
       recharging.value = true;
       try {
-        const res = await fetch(`${API_BASE_URL}/users/${rechargeUser.value.id}/recharge`, {
+        const res = await apiRequest(`${API_BASE_URL}/users/${rechargeUser.value.id}/recharge`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+
           body: JSON.stringify({ amount, userId: user.value.id })
         });
         const data = await res.json();
@@ -1669,7 +1690,7 @@ const AdminPage = {
       const result = await Modal.confirm('确定要删除这个用户吗？');
       if (!result) return;
       try {
-        const res = await fetch(`${API_BASE_URL}/admin/users/${id}`, { method: 'DELETE' });
+        const res = await apiRequest(`${API_BASE_URL}/admin/users/${id}`, { method: 'DELETE' });
         const data = await res.json();
         if (data.success) {
           await Modal.alert('删除成功');
@@ -1682,9 +1703,9 @@ const AdminPage = {
       const result = await Modal.confirm('确定要删除这个任务吗？');
       if (!result) return;
       try {
-        const res = await fetch(`${API_BASE_URL}/tasks/${id}`, {
+        const res = await apiRequest(`${API_BASE_URL}/tasks/${id}`, {
           method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
+
           body: JSON.stringify({ userId: user.value.id })
         });
         const data = await res.json();
@@ -1699,9 +1720,9 @@ const AdminPage = {
       const result = await Modal.confirm('确定要删除这个服务吗？');
       if (!result) return;
       try {
-        const res = await fetch(`${API_BASE_URL}/services/${id}`, {
+        const res = await apiRequest(`${API_BASE_URL}/services/${id}`, {
           method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
+
           body: JSON.stringify({ userId: user.value.id })
         });
         const data = await res.json();
@@ -1716,9 +1737,9 @@ const AdminPage = {
       const result = await Modal.confirm('确定要删除这个帖子吗？');
       if (!result) return;
       try {
-        const res = await fetch(`${API_BASE_URL}/forum/${id}`, {
+        const res = await apiRequest(`${API_BASE_URL}/forum/${id}`, {
           method: 'DELETE',
-          headers: { 'Content-Type': 'application/json' },
+
           body: JSON.stringify({ userId: user.value.id })
         });
         const data = await res.json();
@@ -1855,7 +1876,7 @@ router.beforeEach(async (to, from, next) => {
 
 const applyColors = async () => {
   try {
-    const res = await fetch(`${API_BASE_URL}/config/colors`);
+    const res = await apiRequest(`${API_BASE_URL}/config/colors`);
     const data = await res.json();
     if (data.success) {
       const colors = data.data;
