@@ -1779,7 +1779,9 @@ const App = {
     const router = useRouter();
     const route = useRoute();
     
-    const isLoggedIn = computed(() => Auth.isLoggedIn());
+    // 使用响应式变量存储用户登录状态，解决导航栏不显示的问题
+    const isLoggedInRef = ref(Auth.isLoggedIn());
+    const isLoggedIn = computed(() => isLoggedInRef.value);
     const currentRoute = computed(() => route.path);
 
     const isLoginPage = computed(() => route.path === '/login' || route.path === '/register');
@@ -1803,6 +1805,11 @@ const App = {
       if (modalCallbacks.onCancel) modalCallbacks.onCancel();
       showModal.value = false;
     };
+
+    // 监听路由变化，更新登录状态
+    watch(() => route.path, () => {
+      isLoggedInRef.value = Auth.isLoggedIn();
+    }, { immediate: true });
 
     onMounted(() => {
       Modal.on((config) => {

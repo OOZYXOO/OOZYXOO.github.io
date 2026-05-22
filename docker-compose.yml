@@ -18,7 +18,7 @@ services:
   ngrok:
     image: ngrok/ngrok:latest
     container_name: campus-task-ngrok
-    command: http backend:3000 --allow-cidr '0.0.0.0/0' --allow-hostname '*' --request-header-add 'ngrok-skip-browser-warning: true'
+    command: http backend:3000
     ports:
       - "4040:4040"
     environment:

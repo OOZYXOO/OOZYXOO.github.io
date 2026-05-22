@@ -723,3 +723,152 @@ body {
     font-size: 17px;
   }
 }
+
+/* 移动端增强优化 */
+@media (max-width: 768px) {
+  body {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  .container {
+    max-width: 100%;
+  }
+
+  .nav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .btn, .nav-item, .tab-btn, .sub-tab-btn, .filter-btn, .fab, .refresh-btn, .close-btn {
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .modal-overlay {
+    padding: 12px;
+  }
+
+  .modal-content {
+    padding: 20px;
+    border-radius: 12px;
+  }
+
+  .form-input, .form-textarea {
+    font-size: 16px;
+  }
+
+  .fab:hover, .btn:hover {
+    transform: none;
+  }
+
+  .fab:active {
+    box-shadow: 0 4px 16px rgba(7, 193, 96, 0.35);
+  }
+
+  .fab:active {
+    transform: scale(0.95);
+  }
+
+  .card:hover {
+    transform: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .user-stats {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .action-btns {
+    flex-direction: column;
+  }
+
+  .action-btns .btn {
+    width: 100%;
+  }
+}
+
+/* 超小屏幕优化 */
+@media (max-width: 375px) {
+  .header {
+    padding: 14px 12px;
+    font-size: 16px;
+  }
+
+  .nav-item {
+    padding: 10px 12px;
+    font-size: 12px;
+  }
+
+  .card {
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+
+  .btn {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+
+  .fab {
+    width: 48px;
+    height: 48px;
+    font-size: 26px;
+    bottom: 16px;
+    right: 16px;
+  }
+
+  .refresh-btn {
+    width: 44px;
+    height: 44px;
+    bottom: 16px;
+    left: 16px;
+  }
+
+  .user-avatar {
+    width: 52px;
+    height: 52px;
+    font-size: 22px;
+  }
+
+  .user-name {
+    font-size: 17px;
+  }
+
+  .stat-value {
+    font-size: 24px;
+  }
+
+  .modal-title {
+    font-size: 18px;
+  }
+}
+
+/* 安全区域适配（针对刘海屏等 */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .header {
+    padding-top: calc(18px + env(safe-area-inset-top));
+  }
+}
+
+/* 横屏优化 */
+@media (orientation: landscape) and (max-height: 500px) {
+  .fab {
+    bottom: 12px;
+    right: 12px;
+  }
+  
+  .refresh-btn {
+    bottom: 12px;
+    left: 12px;
+  }
+}
