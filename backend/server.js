@@ -235,28 +235,34 @@ app.delete('/api/tasks/:id', (req, res) => {
   if (task) {
     const { userId } = req.body;
     
-    if (task.status !== 'open') {
-      return res.status(400).json({ success: false, message: '只能删除可接单状态的任务' });
-    }
+    // 检查用户是否是管理员
+    const user = users.find(u => u.id === userId);
+    const isAdmin = user && user.role === 'admin';
     
-    // 只有发布者或管理员可以删除
-    if (task.publisherId !== userId) {
-      const user = users.find(u => u.id === userId);
-      if (!user || user.role !== 'admin') {
-        return res.status(403).json({ success: false, message: '无权限删除此任务' });
+    // 如果是发布者且不是管理员，检查任务状态
+    if (task.publisherId === userId && !isAdmin) {
+      if (task.status !== 'open') {
+        return res.status(400).json({ success: false, message: '只能删除可接单状态的任务' });
       }
     }
     
-    // 退回金额给发布者
-    const publisherIndex = users.findIndex(u => u.id === task.publisherId);
-    if (publisherIndex !== -1) {
-      const publisher = users[publisherIndex];
-      users[publisherIndex] = {
-        ...publisher,
-        balance: formatAmount((publisher.balance || 0) + task.reward),
-        updatedAt: new Date().toISOString()
-      };
-      saveData('users', users);
+    // 只有发布者或管理员可以删除
+    if (task.publisherId !== userId && !isAdmin) {
+      return res.status(403).json({ success: false, message: '无权限删除此任务' });
+    }
+    
+    // 如果任务是开放状态，退回金额给发布者
+    if (task.status === 'open') {
+      const publisherIndex = users.findIndex(u => u.id === task.publisherId);
+      if (publisherIndex !== -1) {
+        const publisher = users[publisherIndex];
+        users[publisherIndex] = {
+          ...publisher,
+          balance: formatAmount((publisher.balance || 0) + task.reward),
+          updatedAt: new Date().toISOString()
+        };
+        saveData('users', users);
+      }
     }
     
     tasks = tasks.filter(t => t.id !== req.params.id);
@@ -577,25 +583,26 @@ app.delete('/api/services/:id', (req, res) => {
   const service = services.find(s => s.id === req.params.id);
   if (service) {
     const { userId } = req.body;
+    const users = loadData('users');
+    const user = users.find(u => u.id === userId);
+    const isAdmin = user && user.role === 'admin';
     
     // 只有服务提供者或管理员可以删除
-    if (service.providerId !== userId) {
-      const users = loadData('users');
-      const user = users.find(u => u.id === userId);
-      if (!user || user.role !== 'admin') {
-        return res.status(403).json({ success: false, message: '无权限删除此服务' });
-      }
+    if (service.providerId !== userId && !isAdmin) {
+      return res.status(403).json({ success: false, message: '无权限删除此服务' });
     }
     
-    // 检查是否有进行中的订单
-    const orders = loadData('orders');
-    const hasActiveOrders = orders.some(o => 
-      o.serviceId === service.id && 
-      (o.status === 'pending' || o.status === 'processing')
-    );
-    
-    if (hasActiveOrders) {
-      return res.status(400).json({ success: false, message: '该服务有进行中的订单，无法删除，请先下架服务' });
+    // 如果不是管理员，检查是否有进行中的订单
+    if (!isAdmin) {
+      const orders = loadData('orders');
+      const hasActiveOrders = orders.some(o => 
+        o.serviceId === service.id && 
+        (o.status === 'pending' || o.status === 'processing')
+      );
+      
+      if (hasActiveOrders) {
+        return res.status(400).json({ success: false, message: '该服务有进行中的订单，无法删除，请先下架服务' });
+      }
     }
     
     services = services.filter(s => s.id !== req.params.id);
