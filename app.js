@@ -1370,7 +1370,7 @@ const AdminPage = {
               <span style="font-size: 18px; font-weight: 700; color: var(--primary-color);">¥{{ formatMoney(task.reward) }}</span>
               <span style="font-size: 12px; color: var(--text-secondary);">{{ formatDate(task.createdAt) }}</span>
             </div>
-            <button v-if="task.status === 'open'" class="btn btn-danger btn-sm" style="margin-top: 10px;" @click="deleteTask(task.id)">删除任务</button>
+            <button class="btn btn-danger btn-sm" style="margin-top: 10px;" @click="deleteTask(task.id)">删除任务</button>
           </div>
         </div>
       </div>
